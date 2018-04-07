@@ -194,9 +194,50 @@ status_2 = merge_repeating_heads()
 print 'Merged repeating heads : {}'.format(status_2)
 traverse()
 
-def cfpm(min_sup,count):
+def cfpm(min_sup):
     # reverse array of frequent 1-itemsets
-    freq_one_itemsets = [i if count[i] >= min_sup for i in xrange(len(count))]
-    freq_one_itemsets.sort().reverse()
+    freq_one_itemsets = [i for i in xrange(len(count)) if count[i]>=min_sup]
+    freq_one_itemsets.sort()
+    freq_one_itemsets.reverse()
+    print freq_one_itemsets
     for i in freq_one_itemsets:
         
+        # delete head with data equal to the considered itemset
+        head = main_root.child
+        deleted_head = 0
+        if head.data == i:
+            main_root.child = head.sibling
+            deleted_head = 1
+            # print 'if1'
+            del(head)
+        if deleted_head == 0:
+            # print 'if2'
+            head_parent = head
+            head = head.sibling
+            
+            while head is not None and head.data != i:
+                head = head.sibling
+                head_parent = head_parent.sibling
+
+            if head is not None and head.data == i:
+                # print 'if3'
+                # print i
+                # traverse()
+                # print 't1 end'
+
+                head_parent.sibling = head.sibling
+                del(head)
+                # traverse()
+                # print 't2 end'
+        # test 1 - working 
+        # if i == 8:
+           # break
+
+        # 
+
+cfpm(3)
+traverse()
+
+
+
+            
