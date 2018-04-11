@@ -189,9 +189,95 @@ def merge_repeating_heads():
         head_parent = root
     return True
 
+# merging repeating heads
+def merge_repeating_siblings():
+    root = main_root.child
+    head = root.sibling
+    head_parent = root
+    sibling_check = []
+    sibling_check.append(root)
+    while len(sibling_check) != 0:
+
+        while root.sibling is not None:
+            while head is not None:
+                print 'root {}, head {}'.format(root.data,head.data)
+                if head.data != root.data:
+                    head = head.sibling
+                    head_parent = head_parent.sibling
+                    continue
+                else:
+                    # merge
+                    if root != sibling_check[-1]:
+                        sibling_check.append(root)
+                    root_ptr = root
+                    head_ptr = head
+                    #while head_ptr is not None or root_ptr is not None:
+                    while head_ptr.data == root_ptr.data :
+                        if head_ptr.child is not None and root_ptr.child is not None:
+                            root_ptr.count = root_ptr.count + head_ptr.count
+                            if head_ptr.sibling is not None and head_ptr.sibling != head.sibling:
+                                last_sibling = root_ptr.sibling
+                                while last_sibling.sibling is not None:
+                                    last_sibling = last_sibling.sibling
+                                last_sibling.sibling = head_ptr.sibling
+                            root_ptr = root_ptr.child
+                            head_ptr = head_ptr.child
+                        
+                        if root_ptr.child is None and head_ptr.child is not None:
+                            root_ptr.child = head_ptr.child
+                            if root_ptr.data == head_ptr.data:
+                                root_ptr.count = root_ptr.count + head_ptr.count
+                            break
+                        if head_ptr.child is None:
+                            head_ptr_sibling = head_ptr
+                            if root_ptr.data == head_ptr.data:
+                                root_ptr.count = root_ptr.count + head_ptr.count
+                                head_ptr_sibling = head_ptr.sibling
+                            last_sibling = root_ptr
+                            while last_sibling.sibling is not None:
+                                last_sibling = last_sibling.sibling
+                            last_sibling.sibling = head_ptr_sibling
+                            break
+
+                    head_parent.sibling = head.sibling
+                    head = head_parent.sibling
+            root = root.sibling
+            head = root.sibling
+            head_parent = root
+        if len(sibling_check) == 0:
+            return True
+        #x = sibling_check.pop()
+        #sibling_check.append(x.child)
+        #root = x.child
+        #while root.sibling is not None:
+        #head = root.sibling
+        #head_parent = root
+
+        x = sibling_check.pop()
+        root = x.child
+        while root is None or root.sibling is None:
+            if root is None:
+                if len(sibling_check) == 0:
+                    return True
+                x = sibling_check.pop()
+                root = x.child
+            else:
+                root = root.child
+                #sibling_check.append(root)
+        sibling_check.append(root)
+        head = root.sibling
+        head_parent = root
+    return True
+
+
 status_2 = False
 status_2 = merge_repeating_heads()
 print 'Merged repeating heads : {}'.format(status_2)
+traverse()
+
+status_3 = False
+status_3 = merge_repeating_siblings()
+print 'Merged repeating siblings : {}'.format(status_3)
 traverse()
 
 def cfpm(min_sup):
@@ -230,13 +316,13 @@ def cfpm(min_sup):
                 # traverse()
                 # print 't2 end'
         # test 1 - working 
-        # if i == 8:
-           # break
+        if i == 8:
+            break
 
         # 
 
 cfpm(3)
-traverse()
+#traverse()
 
 
 
