@@ -18,7 +18,10 @@ r2=9469
 r=10
 count = [0 for i in range(10) ]
 root = Node()
-
+print 'Transactions'
+for i in transactions:
+    print i
+print 'PC-Tree Construction'
 main_root = root
 for i in range(0, len(transactions)):
     for j in range(0, len(transactions[i])):
@@ -135,7 +138,7 @@ status = False
 status = delete_infrequent_nodes(3)
 print 'Deleted infrequent nodes: {}'.format(status)
 traverse()
-print count
+#print count
 
 
 # merging repeating heads
@@ -200,7 +203,7 @@ def merge_repeating_siblings():
 
         while root.sibling is not None:
             while head is not None:
-                print 'root {}, head {}'.format(root.data,head.data)
+                #print 'root {}, head {}'.format(root.data,head.data)
                 if head.data != root.data:
                     head = head.sibling
                     head_parent = head_parent.sibling
@@ -270,16 +273,17 @@ def merge_repeating_siblings():
     return True
 
 
-status_2 = False
-status_2 = merge_repeating_heads()
-print 'Merged repeating heads : {}'.format(status_2)
-traverse()
+#status_2 = False
+#status_2 = merge_repeating_heads()
+#print 'Merged repeating heads : {}'.format(status_2)
+#traverse()
 
 status_3 = False
 status_3 = merge_repeating_siblings()
-print 'Merged repeating siblings : {}'.format(status_3)
+print 'Merged repeating heads and siblings : {}'.format(status_3)
 traverse()
 
+'''
 def cfpm(min_sup):
     # reverse array of frequent 1-itemsets
     freq_one_itemsets = [i for i in xrange(len(count)) if count[i]>=min_sup]
@@ -318,12 +322,57 @@ def cfpm(min_sup):
         # test 1 - working 
         if i == 8:
             break
+       
+# pct traversal for getting paths ending with i
+    #def traverse():
+        nodes = []
+        paths = []
+        root = main_root.child
+        nodes.append(root)
+        i = 0
+        break_flag = 0
+        temp_paths = []
+        while len(nodes)!=0:
+            
+            while root.child is not None:
+                root = root.child
+                nodes.append(root)
+                
+            x = nodes.pop()
+            temp_paths.append([x.count, []])
+            
+            while x.sibling is None:
+                #print '({}, {})'.format(x.data, x.count)
+                for j in range(len(temp_paths)):
+                    if j == i:
+                        temp_paths[i][1].append(x.data)
+                    else:
+                        if temp_paths[j][1][-1] > x.data:
+                            temp_paths[j][1].append(x.data)
+                if len(nodes) == 0:
+                    break_flag = 1
+                    break
+                x = nodes.pop()
 
-        # 
+            if break_flag == 1:
+                break
+            # print '({}, {})'.format(x.data, x.count)
+            # temp_paths[i][1].append(x.data)
+            for j in range(len(temp_paths)):
+                if j == i:
+                    temp_paths[i][1].append(x.data)
+                else:
+                    if temp_paths[j][1][-1] > x.data:
+                        temp_paths[j][1].append(x.data)
+            i+=1
+            root = x.sibling
+            nodes.append(root)
+            # 
+
 
 cfpm(3)
 #traverse()
 
 
-
+'''
             
