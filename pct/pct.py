@@ -386,8 +386,105 @@ def cfpm(min_sup):
         
         print paths
 
-        if i == freq_one_itemsets[0]:
-            break
+        #if i == freq_one_itemsets[0]:
+            #break
+        
+        # get paths ending with I
+        # example - paths = [[count , e1, e2, e3, ...]]
+        # paths = [[1,2,4,6,7],[1,2,6,7], [1,4,5,7], [1,5,6,7],[3,3,5,7]]
+        
+        #paths = getpath(I)
+        # paths = [[1,4088,9278],[1,6151,9278]]
+        # list containing all other elements
+        l1 = [i for i in f if i<=I]
+        minsupport_dict={}
+        for i in l1:
+            minsupport_dict[i]=0
+        for i in range(0,len(paths)):
+            for j in range(1,len(paths[i])):
+                minsupport_dict[paths[i][j]] += paths[i][0]
+        T = []
+        for key,value in minsupport_dict.iteritems():
+            if key!=I:
+                if value >= minsup:
+                    T.append(key)
+
+        # removing elements from paths that are not in T
+        # reduced paths
+        reduced_paths=[]
+        for i in range(0,len(paths)):
+            reduced_paths.append([])
+
+        for i in range(0,len(paths)):
+            reduced_paths[i].append(paths[i][0])
+            for j in range(1,len(paths[i])):
+                if (paths[i][j] in T or paths[i][j]==I):
+                    reduced_paths[i].append(paths[i][j])
+
+        print "Reduced paths = {}".format(reduced_paths)
+
+
+        closed_freq=[]
+        # determining closed frequent itemsets from reduced paths
+        '''for i in range(0,len(paths)-1):
+            for j in range(i+1,len(paths)):
+                # add case where path array already considered for
+                # previous i
+                if len(paths[i])>=len(paths[j]):
+                    if set(paths[j])<=set(paths[i]):
+                        paths[i][0]+=paths[j][0]
+                elif len(paths[i])<len(paths[j]):
+                    if set(paths[i])<=set(paths[j]):
+                        paths[i][0]+=paths[j][0]
+        print "paths: ={}".format(paths)        
+        '''
+        i,j= 0,0
+        while i < len(reduced_paths):
+            j = i+1
+            while j < len(reduced_paths):
+                if(reduced_paths[i][1:] == reduced_paths[j][1:]):
+                    reduced_paths[i][0] += reduced_paths[j][0]
+                    del reduced_paths[j]
+                    j -= 1
+                elif set(reduced_paths[i]).issubset(reduced_paths[j]):
+                    reduced_paths[i][0] += reduced_paths[j][0]
+                j += 1
+            i += 1
+        print reduced_paths
+        ''''
+        rp=[]
+        l=[]
+        # to merge counts of same reduced_paths
+        for i in range(0,len(reduced_paths)-1):
+            a = reduced_paths[i]
+            count = a[0]
+            #del a[0]
+            for j in range(i+1,len(reduced_paths)):
+                b = reduced_paths[j]
+                #del b[0]
+                if set(a)==set(b):
+                    count += reduced_paths[j][0]
+            
+            # reduced paths containing distinct lists with count
+            rp.append([])
+            rp.append(count)
+            for j in range(1,len(reduced_paths[i])):
+                rp.append(reduced_paths[i][j])
+            print rp
+        '''
+
+        # paths starting with elements in T and ending with I
+        start = T
+        end = I
+
+        for i in reduced_paths:
+            start_el = i[1]
+            end_el = i[-1]
+            if start_el not in T or end_el != I:
+                del i
+        print reduced_paths
+
+        
 
 
 '''       
