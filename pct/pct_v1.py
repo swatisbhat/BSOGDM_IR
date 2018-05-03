@@ -5,12 +5,12 @@ class Node(object):
         self.sibling = None
         self.data = data
         self.count = count
-#transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
-#    2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
+transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
+    2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
 
 import json
 load_transactions = open('../apriori/itemsets','r')
-transactions = json.load(load_transactions)
+#transactions = json.load(load_transactions)
 #print transactions_2[0:2]
 # pct construction
 r2=len(transactions)
@@ -97,34 +97,25 @@ def delete_infrequent_nodes(min_sup):
     root = main_root
 
     parent = main_root
-    #flag_switch = 0
     while True:
-        #if flag_switch == 0:
         while root.child is not None:
-            print 'root.child at the beginning of the while loop {}'.format(root.child.data)
-            print 'count(root child data) {} min sup {}'.format(count[root.child.data],min_sup) 
             if count[root.child.data] < min_sup:
                 # delete
                 temp = root.child
                 root.child = temp.child
-                print 'Hey1'
                 if temp.child is None:
                     root.child = temp.sibling
-                    print '{} temp.sibling {} root.child'.format(temp.sibling.data,root.child.data)
+                    
                 elif temp.sibling is not None:
-                    print 'Hey2'
                     last_sibling = temp.child
                     while last_sibling.sibling is not None:
                         last_sibling = last_sibling.sibling
                     last_sibling.sibling = temp.sibling
                     # free memory
-                print 'Hey3'
                 del(temp)
             else:
-                print 'hey_else'
                 nodes.append(root.child)
                 root = root.child
-            print 'hey4'
         if nodes[-1] != root:
             nodes.append(root)
 
@@ -132,8 +123,7 @@ def delete_infrequent_nodes(min_sup):
         flag = 0
         while flag == 0:
             if len(nodes)==0:
-                
-                nodes.append(root)
+                return
             x = nodes.pop()
             
             while x.sibling is None:
@@ -168,7 +158,7 @@ def delete_infrequent_nodes(min_sup):
         nodes.append(root)
     return True
 status = False
-status = delete_infrequent_nodes(2)
+status = delete_infrequent_nodes(3)
 print 'Deleted infrequent nodes: {}'.format(status)
 traverse()
 #print count
@@ -311,13 +301,12 @@ def merge_repeating_siblings():
 #print 'Merged repeating heads : {}'.format(status_2)
 #traverse()
 
-#status_3 = False
-#status_3 = merge_repeating_siblings()
-#print 'Merged repeating heads and siblings : {}'.format(status_3)
-#traverse()
+status_3 = False
+status_3 = merge_repeating_siblings()
+print 'Merged repeating heads and siblings : {}'.format(status_3)
+traverse()
 
-print [ i for i in range(len(count)) if count[i]>=2] 
-
+'''
 def cfpm(min_sup):
     # reverse array of frequent 1-itemsets
     freq_one_itemsets = [i for i in xrange(len(count)) if count[i]>=min_sup]
@@ -354,43 +343,9 @@ def cfpm(min_sup):
                 # traverse()
                 # print 't2 end'
         # test 1 - working 
-        #if i == 8:
-        #    break
-        print 'deleted head'
-        traverse()
-
-        paths = []
-        root = main_root.child
-        while root is not None:
-            print 'root child {}'.format(root.data), root.child is None
-            if root.child is None:
-                root = root.sibling
-                #print 'continue loop head {}'.format(root.data) , root.sibling is None
-                continue
-            #print  root.child.sibling is None
-            if root.child.sibling is None:
-                print 'child data = {}'.format(root.child.data)
-                print 'i {}'.format(i)
-                if root.child.data == i:
-                    paths.append([root.child.count, root.data, root.child.data])
-            else:
-                child = root.child
-                while child.sibling is not None:
-                    if child.data == i:
-                        paths.append([child.count, root.data, child.data])
-                    child = child.sibling
-            root = root.sibling        
-            #print 'end of while loop root child {}'.format(root.data), root.child is None
-            #print 'head {}'.format(root.data) , root.sibling is None
-
-        
-        print paths
-
-        if i == freq_one_itemsets[0]:
+        if i == 8:
             break
-
-
-'''       
+       
 # pct traversal for getting paths ending with i
     #def traverse():
         nodes = []
@@ -436,11 +391,11 @@ def cfpm(min_sup):
             root = x.sibling
             nodes.append(root)
             # 
-'''
-        
 
-cfpm(2)
+
+cfpm(3)
 #traverse()
 
 
+'''
             

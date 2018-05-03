@@ -12,7 +12,7 @@ import sys
 from itertools import chain, combinations
 from collections import defaultdict
 from optparse import OptionParser
-
+import json
 
 def subsets(arr):
     """ Returns non empty subsets of arr"""
@@ -123,8 +123,15 @@ def printResults(items, rules):
     
     for item in items:
         transaction_list.append(item)
+
+    item_sets = []
     for i in transaction_list:
-        print "tl {}".format(i)
+        j = [ int(k) for k in list(i[0])  ]
+        print "{}".format(j)
+        item_sets.append(j)
+    itemsets = open('itemsets','w')
+    json.dump(item_sets, itemsets) 
+
     '''for rule in rules:
         transaction_list.append([])
         pre,post=rule
@@ -140,7 +147,7 @@ def printResults(items, rules):
     '''    
     for rule, confidence in sorted(rules, key=lambda (rule, confidence): confidence):
         pre, post = rule
-        print "Rule: %s ==> %s , %.3f" % (str(pre), str(post), confidence)
+        # print "Rule: %s ==> %s , %.3f" % (str(pre), str(post), confidence)
     
     #print "transaction[0][0] = {}".format(transaction_list[0][0])
 
