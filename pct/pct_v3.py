@@ -5,15 +5,24 @@ class Node(object):
         self.sibling = None
         self.data = data
         self.count = count
-transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
-    2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
-
-import json
-load_transactions = open('../apriori/itemsets','r')
-#transactions = json.load(load_transactions)
+# transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
+   # 2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
+# transactions = [[1,2,3,4,5,6],[1,2,3,4,5,6],[1,2,3,6],[3,4,5,6],[3,4,6],[4,5]]
+# transactions = [[1,3,6,8],[3,7],[3,8],[7,8],[7,9]] # min_sup 3
+# transactions = [[1,3,6,8],[1,3,7,8],[3,6],[3,8],[6]] # min sup 3
+transactions = [[1,3,6,8],[1,3,7,9],[3,6],[3,8],[6]] # min sup 3
+# transactions = [[1,6,8],[1,7,8],[2,6,9],[7]] # min sup2 
+# transactions = [[1,6,8],[1,7,8],[2,6,9],[2,6,10],[7]] # min sup 2
+# transactions = [[1,6,8],[1,7,8],[2,6,7]] # min sup 2
+# transactions = [[1,6,8],[1,7,8],[2,6,9]] # mon sup 2
+# import json
+# load_transactions = open('../apriori/itemsets','r')
+# transactions = json.load(load_transactions)
 #print transactions_2[0:2]
 # pct construction
 r2=len(transactions)
+
+# get number of distinct items and max item val
 items = []
 max_val = 0
 distinct_items = 0
@@ -27,44 +36,61 @@ for i in transactions:
 
 #distinct_items = len(list(set(transactions_2)))
 r=10
+# max_val = maximum value item ( 9 in the above)
 count = [0 for i in range(max_val+1) ]
 print len(count)
 root = Node()
+
+
 print 'Transactions'
 for i in transactions:
     print i
 print 'PC-Tree Construction'
-main_root = root
-for i in range(0, len(transactions)):
-    for j in range(0, len(transactions[i])):
-        #print transactions[i][j]
-        #print len(count)
-        count[transactions[i][j]] += 1
-        if root.child == None:
-            root.child = Node(transactions[i][j], count=1)
-            root = root.child
-        elif root.child.data == transactions[i][j]:
-            root.child.count += 1
-            #print 'data {} count {}'.format(root.child.data, root.child.count) 
-            root = root.child
-        else:
-            root = root.child
-            flag = 0
-            while(root.sibling is not None):
-                if root.sibling.data != transactions[i][j]:
-                    root = root.sibling
-                else:
-                    root.sibling.count += 1
-                    #print 'data {} count {}'.format(root.sibling.data,
-                    #        root.sibling.count) 
-                    root = root.sibling
-                    flag = 1
-                    break
-            if flag == 0:
-                root.sibling = Node(transactions[i][j], count=1)
-                root = root.sibling
-    root = main_root
 
+main_root = root
+
+def construct():
+
+    global root, main_root
+    for i in range(0, len(transactions)):
+        for j in range(0, len(transactions[i])):
+            #print transactions[i][j]
+            #print len(count)
+            count[transactions[i][j]] += 1
+            # case 1 : empty sub tree
+            if root.child == None:
+                root.child = Node(transactions[i][j], count=1)
+                root = root.child
+
+            # case 2 : repeating subtree
+            elif root.child.data == transactions[i][j]:
+                root.child.count += 1
+                #print 'data {} count {}'.format(root.child.data, root.child.count) 
+                root = root.child
+
+            # case 3 : non repeating subtree (=>sibling)
+            else:
+                root = root.child
+                flag = 0 # no sibling with the same item val
+                while(root.sibling is not None):
+                    if root.sibling.data != transactions[i][j]:
+                        root = root.sibling
+                    else:
+                        root.sibling.count += 1
+                        #print 'data {} count {}'.format(root.sibling.data,root.sibling.count) 
+                        root = root.sibling
+                        flag = 1
+                        break
+                if flag == 0:
+                    root.sibling = Node(transactions[i][j], count=1)
+                    root = root.sibling
+        root = main_root
+
+# print "----------------------------------"
+# print main_root.child.data
+# print "----------------------------------"
+
+construct()
 
 # pct traversal
 def traverse():
@@ -90,6 +116,8 @@ def traverse():
 
 traverse()
 
+
+
 # deleting infrequent items
 def delete_infrequent_nodes(min_sup):
     print 'Min Support {}'.format(min_sup)    
@@ -97,25 +125,34 @@ def delete_infrequent_nodes(min_sup):
     root = main_root
 
     parent = main_root
+    #flag_switch = 0
     while True:
+        #if flag_switch == 0:
         while root.child is not None:
+            #print 'root.child at the beginning of the while loop {}'.format(root.child.data)
+            #print 'count(root child data) {} min sup {}'.format(count[root.child.data],min_sup) 
             if count[root.child.data] < min_sup:
                 # delete
                 temp = root.child
                 root.child = temp.child
+
                 if temp.child is None:
                     root.child = temp.sibling
-                    
+                    #print '{} temp.sibling {} root.child'.format(temp.sibling.data,root.child.data)
                 elif temp.sibling is not None:
+
                     last_sibling = temp.child
                     while last_sibling.sibling is not None:
                         last_sibling = last_sibling.sibling
                     last_sibling.sibling = temp.sibling
                     # free memory
+
                 del(temp)
             else:
+
                 nodes.append(root.child)
                 root = root.child
+
         if nodes[-1] != root:
             nodes.append(root)
 
@@ -123,7 +160,8 @@ def delete_infrequent_nodes(min_sup):
         flag = 0
         while flag == 0:
             if len(nodes)==0:
-                return
+                
+                nodes.append(root)
             x = nodes.pop()
             
             while x.sibling is None:
@@ -147,7 +185,9 @@ def delete_infrequent_nodes(min_sup):
                         last_sibling.sibling = temp.sibling
                 elif temp.child is None:
                     root.sibling = temp.sibling
-
+                #### bug edit
+                root = root.sibling 
+                #### bug edit
                 del(temp)
 
             #print '({}, {})'.format(x.data, x.count)
@@ -163,7 +203,7 @@ print 'Deleted infrequent nodes: {}'.format(status)
 traverse()
 #print count
 
-
+'''
 # merging repeating heads
 def merge_repeating_heads():
     root = main_root.child
@@ -301,18 +341,19 @@ def merge_repeating_siblings():
 #print 'Merged repeating heads : {}'.format(status_2)
 #traverse()
 
-status_3 = False
-status_3 = merge_repeating_siblings()
-print 'Merged repeating heads and siblings : {}'.format(status_3)
-traverse()
+#status_3 = False
+#status_3 = merge_repeating_siblings()
+#print 'Merged repeating heads and siblings : {}'.format(status_3)
+#traverse()
 
-'''
+#print [ i for i in range(len(count)) if count[i]>=2] 
+
 def cfpm(min_sup):
     # reverse array of frequent 1-itemsets
     freq_one_itemsets = [i for i in xrange(len(count)) if count[i]>=min_sup]
     freq_one_itemsets.sort()
     freq_one_itemsets.reverse()
-    print freq_one_itemsets
+    print 'frequent one itemsets = {}'.format(freq_one_itemsets)
     for i in freq_one_itemsets:
         
         # delete head with data equal to the considered itemset
@@ -343,59 +384,114 @@ def cfpm(min_sup):
                 # traverse()
                 # print 't2 end'
         # test 1 - working 
-        if i == 8:
-            break
-       
-# pct traversal for getting paths ending with i
-    #def traverse():
-        nodes = []
+        #if i == 8:
+        #    break
+        #print 'deleted head'
+        #traverse()
+
         paths = []
         root = main_root.child
-        nodes.append(root)
-        i = 0
-        break_flag = 0
-        temp_paths = []
-        while len(nodes)!=0:
-            
-            while root.child is not None:
-                root = root.child
-                nodes.append(root)
-                
-            x = nodes.pop()
-            temp_paths.append([x.count, []])
-            
-            while x.sibling is None:
-                #print '({}, {})'.format(x.data, x.count)
-                for j in range(len(temp_paths)):
-                    if j == i:
-                        temp_paths[i][1].append(x.data)
-                    else:
-                        if temp_paths[j][1][-1] > x.data:
-                            temp_paths[j][1].append(x.data)
-                if len(nodes) == 0:
-                    break_flag = 1
-                    break
-                x = nodes.pop()
+        while root is not None:
+            # print 'root child {}'.format(root.data), root.child is None
+            if root.child is None:
+                root = root.sibling
+                #print 'continue loop head {}'.format(root.data) , root.sibling is None
+                continue
+            #print  root.child.sibling is None
+            if root.child.sibling is None:
+                #print 'child data = {}'.format(root.child.data)
+                #print 'i {}'.format(i)
+                if root.child.data == i:
+                    paths.append([root.child.count, root.data, root.child.data])
+            else:
+                child = root.child
+                while child.sibling is not None:
+                    if child.data == i:
+                        paths.append([child.count, root.data, child.data])
+                    child = child.sibling
+            root = root.sibling        
+            #print 'end of while loop root child {}'.format(root.data), root.child is None
+            #print 'head {}'.format(root.data) , root.sibling is None
 
-            if break_flag == 1:
-                break
-            # print '({}, {})'.format(x.data, x.count)
-            # temp_paths[i][1].append(x.data)
-            for j in range(len(temp_paths)):
-                if j == i:
-                    temp_paths[i][1].append(x.data)
-                else:
-                    if temp_paths[j][1][-1] > x.data:
-                        temp_paths[j][1].append(x.data)
-            i+=1
-            root = x.sibling
-            nodes.append(root)
-            # 
+        
+        #print paths
+
+        #if i == freq_one_itemsets[0]:
+            #break
+        
+        # get paths ending with I
+        # example - paths = [[count , e1, e2, e3, ...]]
+        # paths = [[1,2,4,6,7],[1,2,6,7], [1,4,5,7], [1,5,6,7],[3,3,5,7]]
+        
+        #paths = getpath(I)
+        # paths = [[1,4088,9278],[1,6151,9278]]
+        # list containing all other elements
+        l1 = [j for j in freq_one_itemsets if j<=i]
+        minsupport_dict={}
+        for j in l1:
+            minsupport_dict[j]=0
+        for j in range(0,len(paths)):
+            for k in range(1,len(paths[j])):
+                minsupport_dict[paths[j][k]] += paths[j][0]
+        T = []
+        for key,value in minsupport_dict.iteritems():
+            if key!=i:
+                if value >= min_sup:
+                    T.append(key)
+
+        # removing elements from paths that are not in T
+        # reduced paths
+        reduced_paths=[]
+        for j in range(0,len(paths)):
+            reduced_paths.append([])
+
+        for j in range(0,len(paths)):
+            reduced_paths[j].append(paths[j][0])
+            for k in range(1,len(paths[j])):
+                if (paths[j][k] in T or paths[j][k]==i):
+                    reduced_paths[j].append(paths[j][k])
+
+        #print "Reduced paths = {}".format(reduced_paths)
 
 
-cfpm(3)
+        closed_freq=[]
+        # determining closed frequent itemsets from reduced paths
+       
+        j,k = 0,0
+        while j < len(reduced_paths):
+            k = j+1
+            while k < len(reduced_paths):
+                if(reduced_paths[j][1:] == reduced_paths[k][1:]):
+                    reduced_paths[j][0] += reduced_paths[k][0]
+                    del reduced_paths[k]
+                    k -= 1
+                elif set(reduced_paths[j]).issubset(reduced_paths[k]):
+                    reduced_paths[j][0] += reduced_paths[k][0]
+                k += 1
+            j += 1
+
+
+        # paths starting with elements in T and ending with I
+        start = T
+        end = i
+
+        for j in reduced_paths:
+            start_el = j[1]
+            end_el = j[-1]
+            if start_el not in T or end_el != i:
+                del j
+
+        cf_itemsets = [j[1:] for j in reduced_paths]
+        print 'cfp for i = {} is {}'.format(i, cf_itemsets)
+
+        
+
+
+
+        
+
+cfpm(2)
 #traverse()
-
 
 '''
             
