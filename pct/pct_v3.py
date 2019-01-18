@@ -10,11 +10,13 @@ transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4]
 # transactions = [[1,2,3,4,5,6],[1,2,3,4,5,6],[1,2,3,6],[3,4,5,6],[3,4,6],[4,5]]
 # transactions = [[1,3,6,8],[3,7],[3,8],[7,8],[7,9]] # min_sup 3
 # transactions = [[1,3,6,8],[1,3,7,8],[3,6],[3,8],[6]] # min sup 3
+
 #transactions = [[1,3,6,8],[1,3,7,9],[3,6],[3,8],[6]] # min sup 3
 # transactions = [[1,6,8],[1,7,8],[2,6,9],[7]] # min sup2 
 # transactions = [[1,6,8],[1,7,8],[2,6,9],[2,6,10],[7]] # min sup 2
+# transactions = [[1,6,8],[1,7,8],[2,6,9],[7]] # min sup 2
 # transactions = [[1,6,8],[1,7,8],[2,6,7]] # min sup 2
-# transactions = [[1,6,8],[1,7,8],[2,6,9]] # mon sup 2
+transactions = [[1,6,8],[1,7,8],[2,6,9]] # mon sup 2
 # import json
 # load_transactions = open('../apriori/itemsets','r')
 # transactions = json.load(load_transactions)
@@ -221,7 +223,8 @@ def delete_infrequent_nodes(min_sup):
                 elif temp.child is None:
                     root.sibling = temp.sibling
                 #### bug edit
-                root = root.sibling 
+                nodes.append(root)
+                #root = root.sibling 
                 #### bug edit
                 del(temp)
 
@@ -233,7 +236,7 @@ def delete_infrequent_nodes(min_sup):
         nodes.append(root)
     return True
 status = False
-status = delete_infrequent_nodes(3)
+status = delete_infrequent_nodes(2)
 print 'Deleted infrequent nodes: {}'.format(status)
 traverse()
 #print count
