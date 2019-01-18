@@ -215,7 +215,8 @@ def delete_infrequent_nodes(min_sup):
                 elif temp.child is None:
                     root.sibling = temp.sibling
                 #### bug edit
-                root = root.sibling 
+                # root = root.sibling 
+                nodes.append(root)
                 #### bug edit
                 del(temp)
 
@@ -332,33 +333,8 @@ def cfpm(min_sup):
     freq_one_itemsets.reverse()
     print 'frequent one itemsets = {}'.format(freq_one_itemsets)
     for i in freq_one_itemsets:
-        print 'i {} '.format(i)
-        
-        # delete head with data equal to the considered itemset
-        '''
-        head = main_root.child
-        deleted_head = 0
-        if head.data == i:
-            main_root.child = head.sibling
-            deleted_head = 1
-            # print 'if1'
-            del(head)
-        if deleted_head == 0:
-            # print 'if2'
-            head_parent = head
-            head = head.sibling
-            
-            while head is not None and head.data != i:
-                head = head.sibling
-                head_parent = head_parent.sibling
-
-            if head is not None:
-                head_parent.sibling = head.sibling
-                del(head)
-        '''
-
-        # print 'Deleted head'
-        #traverse()
+        print '######################################'
+        print 'i = {}\n'.format(i)
 
         # get paths ending with I
         # example - paths = [[count , e1, e2, e3, ...]]
@@ -368,23 +344,31 @@ def cfpm(min_sup):
         # list containing all other elements
 
         # deleting paths starting with i
+        # BUG - 
+        print 'Removing paths starting with ',i
+        j=0
+        while j < len(all_paths):
+            if all_paths[j][1] == i:
+                
+                all_paths.remove(all_paths[j])
+                j-=1
+            j+=1
+            
 
-        for j in all_paths:
-            if j[1] == i:
-                all_paths.remove(j)
+        print 'All paths - ',all_paths,'\n'
 
-
-
+        # print 'paths after removing head - ',all_paths
 
         # getting paths ending with i
         # TODO : simplify below code using list comprehension
         paths_ending_with_i = []
         for path in all_paths:
+
             if path[-1] == i:
                 #print 'i = {}'.format(i)
                 #print 'path = {}'.format(path)
-                paths_ending_with_i.append(path)
-        print 'Paths ending with {} - {}'.format(i,paths_ending_with_i)
+                paths_ending_with_i.append(list(path))
+        print 'Paths ending with {} - {}\n'.format(i,paths_ending_with_i)
         
 
         # removing infrequent elements from paths
@@ -402,19 +386,24 @@ def cfpm(min_sup):
             if val >= min_sup:
                 T.append(key)
 
-        print 'T: {} '.format(T)
+        print 'T: {}\n'.format(T)
         
 
         if len(T) != 0:
             # removing elements from paths that are not in T
+            # print 'All paths before removal: ',all_paths,'\n'
+            for l in paths_ending_with_i:
+                for m in l[1:-1]:
+                    # print 'm = {} l = {}'.format(m,l)
+                    if m not in T:
+                        # l.remove(m)
+                        paths_ending_with_i[paths_ending_with_i.index(l)].remove(m)
+                    # print 'm = {} l = {}'.format(m,l)
+                    # print 'bug print ', all_paths,'\n'
 
-            for j in paths_ending_with_i:
-                for k in j[1:-1]:
-                    if k not in T:
-                        j.remove(k)
-
-            print 'Removed elements : {}'.format(paths_ending_with_i)
-
+            print 'Removed elements : {}\n'.format(paths_ending_with_i)
+            # print 'All paths before removal: ',all_paths,'\n'
+            # print 'Paths after removing head - ',all_paths
             
             # merging duplicate reduced paths
             index = 1
@@ -431,7 +420,8 @@ def cfpm(min_sup):
 
                 index +=1 
 
-            print 'Merged duplicates ',paths_ending_with_i
+            print 'Merged duplicates\n All paths - ',paths_ending_with_i,'\n'
+            # print 'All paths before removal: ',all_paths,'\n'
 
             # final reduced paths (update count considering subsets)
             index =1
@@ -446,10 +436,10 @@ def cfpm(min_sup):
                         # print 'curr path {}, index {}'.format(curr_path, index)
 
                 index+=1
-            print 'Final reduced paths ', paths_ending_with_i
+            print 'Final reduced paths - ', paths_ending_with_i,'\n'
 
         # deleting items that are already processed to give paths ending with smaller elements
-        print 'all paths before removal: ',all_paths
+        # print 'All paths before removal: ',all_paths,'\n'
         j=0
         while j<len(all_paths):
             if all_paths[j][-1] == i:
@@ -457,7 +447,8 @@ def cfpm(min_sup):
                 if len(all_paths[j]) == 1:
                     all_paths.remove(all_paths[j])
             j += 1
-        print 'i {} , all paths {}'.format(i, all_paths)
+        print 'All paths after removal: ',all_paths,'\n'
+        print '############################################'
 
 
         # if i==7:
