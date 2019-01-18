@@ -7,14 +7,7 @@ class Node(object):
         self.count = count
 transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
    2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
-# transactions = [[1,2,3,4,5,6],[1,2,3,4,5,6],[1,2,3,6],[3,4,5,6],[3,4,6],[4,5]]
-# transactions = [[1,3,6,8],[3,7],[3,8],[7,8],[7,9]] # min_sup 3
-# transactions = [[1,3,6,8],[1,3,7,8],[3,6],[3,8],[6]] # min sup 3
-#transactions = [[1,3,6,8],[1,3,7,9],[3,6],[3,8],[6]] # min sup 3
-# transactions = [[1,6,8],[1,7,8],[2,6,9],[7]] # min sup2 
-# transactions = [[1,6,8],[1,7,8],[2,6,9],[2,6,10],[7]] # min sup 2
-# transactions = [[1,6,8],[1,7,8],[2,6,7]] # min sup 2
-# transactions = [[1,6,8],[1,7,8],[2,6,9]] # mon sup 2
+
 # import json
 # load_transactions = open('../apriori/itemsets','r')
 # transactions = json.load(load_transactions)
@@ -129,7 +122,8 @@ def get_paths():
         x = nodes.pop()
         if x.child is None:
             nodes_data = [x.count] + [ i.data for i in nodes] + [x.data]
-            # print x.count, nodes_data
+            
+            print nodes_data
             paths.append(nodes_data)
 
 
@@ -238,58 +232,6 @@ print 'Deleted infrequent nodes: {}'.format(status)
 traverse()
 #print count
 
-
-# merging repeating heads
-def merge_repeating_heads():
-    root = main_root.child
-    head = root.sibling
-    head_parent = root
-    while root.sibling is not None:
-        while head is not None:
-            # print 'root {}, head {}'.format(root.data,head.data)
-            if head.data != root.data:
-                head = head.sibling
-                head_parent = head_parent.sibling
-                continue
-            else:
-                # merge
-                root_ptr = root
-                head_ptr = head
-                #while head_ptr is not None or root_ptr is not None:
-                while head_ptr.data == root_ptr.data :
-                    if head_ptr.child is not None and root_ptr.child is not None:
-                        root_ptr.count = root_ptr.count + head_ptr.count
-                        if head_ptr.sibling is not None and head_ptr.sibling != head.sibling:
-                            last_sibling = root_ptr.sibling
-                            while last_sibling.sibling is not None:
-                                last_sibling = last_sibling.sibling
-                            last_sibling.sibling = head_ptr.sibling
-                        root_ptr = root_ptr.child
-                        head_ptr = head_ptr.child
-                    
-                    if root_ptr.child is None and head_ptr.child is not None:
-                        root_ptr.child = head_ptr.child
-                        if root_ptr.data == head_ptr.data:
-                            root_ptr.count = root_ptr.count + head_ptr.count
-                        break
-                    if head_ptr.child is None:
-                        head_ptr_sibling = head_ptr
-                        if root_ptr.data == head_ptr.data:
-                            root_ptr.count = root_ptr.count + head_ptr.count
-                            head_ptr_sibling = head_ptr.sibling
-                        last_sibling = root_ptr
-                        while last_sibling.sibling is not None:
-                            last_sibling = last_sibling.sibling
-                        last_sibling.sibling = head_ptr_sibling
-                        break
-
-                head_parent.sibling = head.sibling
-                head = head_parent.sibling
-        root = root.sibling
-        head = root.sibling
-        head_parent = root
-    return True
-
 # merging repeating heads
 def merge_repeating_siblings():
     root = main_root.child
@@ -370,21 +312,18 @@ def merge_repeating_siblings():
         head_parent = root
     return True
 
-
-# status_2 = False
-# status_2 = merge_repeating_heads()
-# print 'Merged repeating heads : {}'.format(status_2)
-# traverse()
-
-status_3 = False
-status_3 = merge_repeating_siblings()
-print 'Merged repeating heads and siblings : {}'.format(status_3)
+status_2 = False
+status_2 = merge_repeating_siblings()
+print 'Merged repeating heads and siblings : {}'.format(status_2)
 traverse()
 
 #print [ i for i in range(len(count)) if count[i]>=2] 
 
 # traverse()
+print '-------------------------------'
+print 'All paths: '
 get_paths()
+all_paths = get_paths()
 
 def cfpm(min_sup):
     # reverse array of frequent 1-itemsets
@@ -393,9 +332,10 @@ def cfpm(min_sup):
     freq_one_itemsets.reverse()
     print 'frequent one itemsets = {}'.format(freq_one_itemsets)
     for i in freq_one_itemsets:
+        print 'i {} '.format(i)
         
         # delete head with data equal to the considered itemset
-
+        '''
         head = main_root.child
         deleted_head = 0
         if head.data == i:
@@ -413,116 +353,122 @@ def cfpm(min_sup):
                 head_parent = head_parent.sibling
 
             if head is not None:
-                # print 'if3'
-                # print i
-                # traverse()
-                # print 't1 end'
-
                 head_parent.sibling = head.sibling
                 del(head)
-                # traverse()
-                # print 't2 end'
-        # test 1 - working 
-        #if i == 8:
-        #    break
-        #print 'deleted head'
+        '''
+
+        # print 'Deleted head'
         #traverse()
-        '''
-        paths = []
-        root = main_root.child
-        while root is not None:
-            # print 'root child {}'.format(root.data), root.child is None
-            if root.child is None:
-                root = root.sibling
-                #print 'continue loop head {}'.format(root.data) , root.sibling is None
-                continue
-            #print  root.child.sibling is None
-            if root.child.sibling is None:
-                #print 'child data = {}'.format(root.child.data)
-                #print 'i {}'.format(i)
-                if root.child.data == i:
-                    paths.append([root.child.count, root.data, root.child.data])
-            else:
-                child = root.child
-                while child.sibling is not None:
-                    if child.data == i:
-                        paths.append([child.count, root.data, child.data])
-                    child = child.sibling
-            root = root.sibling        
-            #print 'end of while loop root child {}'.format(root.data), root.child is None
-            #print 'head {}'.format(root.data) , root.sibling is None
-        
-        
-        #print paths
-        '''
-        #if i == freq_one_itemsets[0]:
-            #break
-        
+
         # get paths ending with I
         # example - paths = [[count , e1, e2, e3, ...]]
         # paths = [[1,2,4,6,7],[1,2,6,7], [1,4,5,7], [1,5,6,7],[3,3,5,7]]
-        
-        #paths = getpath(I)
+
         # paths = [[1,4088,9278],[1,6151,9278]]
         # list containing all other elements
 
+        # deleting paths starting with i
+
+        for j in all_paths:
+            if j[1] == i:
+                all_paths.remove(j)
+
+
+
+
         # getting paths ending with i
-        all_paths = get_paths()
+        # TODO : simplify below code using list comprehension
         paths_ending_with_i = []
         for path in all_paths:
             if path[-1] == i:
                 #print 'i = {}'.format(i)
                 #print 'path = {}'.format(path)
                 paths_ending_with_i.append(path)
-        print paths_ending_with_i
-        if i==8:
-            break
+        print 'Paths ending with {} - {}'.format(i,paths_ending_with_i)
+        
 
-        '''
-
-        l1 = [j for j in freq_one_itemsets if j<=i]
-        minsupport_dict={}
-        for j in l1:
-            minsupport_dict[j]=0
-        for j in range(0,len(paths)):
-            for k in range(1,len(paths[j])):
-                minsupport_dict[paths[j][k]] += paths[j][0]
+        # removing infrequent elements from paths
+        count_in_paths = {}
+        for j in paths_ending_with_i:
+            for k in j[1:-1]:
+                if k not in count_in_paths:
+                    count_in_paths[k] = j[0]
+                else:
+                    count_in_paths[k] += j[0]
         T = []
-        for key,value in minsupport_dict.iteritems():
-            if key!=i:
-                if value >= min_sup:
-                    T.append(key)
+        # TODO : sort the dict - easier
+        # else
+        for key,val in count_in_paths.iteritems():
+            if val >= min_sup:
+                T.append(key)
 
-        # removing elements from paths that are not in T
-        # reduced paths
-        reduced_paths=[]
-        for j in range(0,len(paths)):
-            reduced_paths.append([])
+        print 'T: {} '.format(T)
+        
 
-        for j in range(0,len(paths)):
-            reduced_paths[j].append(paths[j][0])
-            for k in range(1,len(paths[j])):
-                if (paths[j][k] in T or paths[j][k]==i):
-                    reduced_paths[j].append(paths[j][k])
+        if len(T) != 0:
+            # removing elements from paths that are not in T
 
-        #print "Reduced paths = {}".format(reduced_paths)
+            for j in paths_ending_with_i:
+                for k in j[1:-1]:
+                    if k not in T:
+                        j.remove(k)
 
+            print 'Removed elements : {}'.format(paths_ending_with_i)
+
+            
+            # merging duplicate reduced paths
+            index = 1
+
+            while index < len(paths_ending_with_i):
+                curr_path = paths_ending_with_i[index]
+                index2 = index
+                for j in range(index2):
+                    if curr_path[1:] == paths_ending_with_i[j][1:]:
+                        paths_ending_with_i[j][0]+=curr_path[0]
+                        paths_ending_with_i.remove(curr_path)
+                        index-=1
+                        # print 'curr path {}, index {}'.format(curr_path, index+1)
+
+                index +=1 
+
+            print 'Merged duplicates ',paths_ending_with_i
+
+            # final reduced paths (update count considering subsets)
+            index =1
+
+            while index < len(paths_ending_with_i):
+                curr_path = paths_ending_with_i[index]
+                
+                for j in range(index):
+                    
+                    if set(curr_path[1:]).issubset(paths_ending_with_i[j][1:]):
+                        paths_ending_with_i[index][0]+=paths_ending_with_i[j][0]
+                        # print 'curr path {}, index {}'.format(curr_path, index)
+
+                index+=1
+            print 'Final reduced paths ', paths_ending_with_i
+
+        # deleting items that are already processed to give paths ending with smaller elements
+        print 'all paths before removal: ',all_paths
+        j=0
+        while j<len(all_paths):
+            if all_paths[j][-1] == i:
+                all_paths[j].remove(i)
+                if len(all_paths[j]) == 1:
+                    all_paths.remove(all_paths[j])
+            j += 1
+        print 'i {} , all paths {}'.format(i, all_paths)
+
+
+        # if i==7:
+            # break
+        
+        '''
 
         closed_freq=[]
         # determining closed frequent itemsets from reduced paths
        
-        j,k = 0,0
-        while j < len(reduced_paths):
-            k = j+1
-            while k < len(reduced_paths):
-                if(reduced_paths[j][1:] == reduced_paths[k][1:]):
-                    reduced_paths[j][0] += reduced_paths[k][0]
-                    del reduced_paths[k]
-                    k -= 1
-                elif set(reduced_paths[j]).issubset(reduced_paths[k]):
-                    reduced_paths[j][0] += reduced_paths[k][0]
-                k += 1
-            j += 1
+        
 
 
         # paths starting with elements in T and ending with I
@@ -544,7 +490,7 @@ def cfpm(min_sup):
 
         
 
-cfpm(2)
+cfpm(3)
 #traverse()
 
 
