@@ -5,14 +5,19 @@ class Node(object):
         self.sibling = None
         self.data = data
         self.count = count
-transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
-   2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
+#transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
+#   2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
 
 # import json
 # load_transactions = open('../apriori/itemsets','r')
 # transactions = json.load(load_transactions)
 #print transactions_2[0:2]
 # pct construction
+
+import ast
+with open("../transactions") as t:
+    transactions = ast.literal_eval(t.read())
+
 r2=len(transactions)
 
 # get number of distinct items and max item val
@@ -261,9 +266,12 @@ def merge_repeating_siblings():
                             root_ptr.count = root_ptr.count + head_ptr.count
                             if head_ptr.sibling is not None and head_ptr.sibling != head.sibling:
                                 last_sibling = root_ptr.sibling
-                                while last_sibling.sibling is not None:
+                                # BUG EDIT - added last_sibling to while
+                                while last_sibling and last_sibling.sibling is not None:
                                     last_sibling = last_sibling.sibling
-                                last_sibling.sibling = head_ptr.sibling
+                                # BUG EDIT - added if to check if last_sibling is not None
+                                if last_sibling:
+                                    last_sibling.sibling = head_ptr.sibling
                             root_ptr = root_ptr.child
                             head_ptr = head_ptr.child
                         
