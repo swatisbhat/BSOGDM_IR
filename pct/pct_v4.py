@@ -10,18 +10,18 @@ class Node(object):
 #    2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
 
 
-# import json
-# load_transactions = open('../apriori/itemsets','r')
-# transactions = json.load(load_transactions)
-#print transactions_2[0:2]
+import json
+load_transactions = open('../transactions','r')
+transactions = json.load(load_transactions)
+
 # pct construction
 
-import ast
-with open("../transactions") as t:
-    transactions = ast.literal_eval(t.read())
+# import ast
+# with open("../transactions") as t:
+#     transactions = ast.literal_eval(t.read())
 
 r2=len(transactions)
-# r2=len(transactions)
+
 
 # get number of distinct items and max item val
 items = []
@@ -35,11 +35,11 @@ for i in transactions:
         if j > max_val:
             max_val = j
 
-#distinct_items = len(list(set(transactions_2)))
-r=10
+
+
 # max_val = maximum value item ( 9 in the above)
 count = [0 for i in range(max_val+1) ]
-print len(count)
+# print len(count)
 root = Node()
 
 
@@ -55,8 +55,8 @@ def construct():
     global root, main_root
     for i in range(0, len(transactions)):
         for j in range(0, len(transactions[i])):
-            #print transactions[i][j]
-            #print len(count)
+            ## print transactions[i][j]
+            ## print len(count)
             count[transactions[i][j]] += 1
             # case 1 : empty sub tree
             if root.child == None:
@@ -66,7 +66,7 @@ def construct():
             # case 2 : repeating subtree
             elif root.child.data == transactions[i][j]:
                 root.child.count += 1
-                #print 'data {} count {}'.format(root.child.data, root.child.count) 
+                ## print 'data {} count {}'.format(root.child.data, root.child.count) 
                 root = root.child
 
             # case 3 : non repeating subtree (=>sibling)
@@ -78,7 +78,7 @@ def construct():
                         root = root.sibling
                     else:
                         root.sibling.count += 1
-                        #print 'data {} count {}'.format(root.sibling.data,root.sibling.count) 
+                        ## print 'data {} count {}'.format(root.sibling.data,root.sibling.count) 
                         root = root.sibling
                         flag = 1
                         break
@@ -87,9 +87,9 @@ def construct():
                     root = root.sibling
         root = main_root
 
-# print "----------------------------------"
-# print main_root.child.data
-# print "----------------------------------"
+# # print "----------------------------------"
+# # print main_root.child.data
+# # print "----------------------------------"
 
 construct()
 
@@ -105,12 +105,12 @@ def traverse():
             
         x = nodes.pop()
         while x.sibling is None:
-            print '({}, {})'.format(x.data, x.count)
+            # print '({}, {})'.format(x.data, x.count)
             if len(nodes) == 0:
                 return
             x = nodes.pop()
 
-        print '({}, {})'.format(x.data, x.count)
+        # print '({}, {})'.format(x.data, x.count)
         root = x.sibling
         nodes.append(root)
 
@@ -131,25 +131,25 @@ def get_paths():
         if x.child is None:
             nodes_data = [x.count] + [ (i.data, i.count) for i in nodes] + [(x.data, x.count)]
             
-            print nodes_data
+            # print nodes_data
             paths.append(nodes_data)
 
 
 
         while x.sibling is None:
-            #print '({}, {})'.format(x.data, x.count)
+            ## print '({}, {})'.format(x.data, x.count)
 
             if len(nodes) == 0:
-                # print paths
+                # # print paths
                 return paths
             x = nodes.pop()
 
-        #print '({}, {})'.format(x.data, x.count)
+        ## print '({}, {})'.format(x.data, x.count)
 
         root = x.sibling
         nodes.append(root)
-    # print 'hey;'
-    # print paths 
+    # # print 'hey;'
+    # # print paths 
     return paths
 
 # get_paths()
@@ -157,7 +157,7 @@ def get_paths():
 
 # deleting infrequent items
 def delete_infrequent_nodes(min_sup):
-    print 'Min Support {}'.format(min_sup)    
+    # print 'Min Support {}'.format(min_sup)    
     nodes = []
     root = main_root
 
@@ -166,8 +166,8 @@ def delete_infrequent_nodes(min_sup):
     while True:
         #if flag_switch == 0:
         while root.child is not None:
-            #print 'root.child at the beginning of the while loop {}'.format(root.child.data)
-            #print 'count(root child data) {} min sup {}'.format(count[root.child.data],min_sup) 
+            ## print 'root.child at the beginning of the while loop {}'.format(root.child.data)
+            ## print 'count(root child data) {} min sup {}'.format(count[root.child.data],min_sup) 
             if count[root.child.data] < min_sup:
                 # delete
                 temp = root.child
@@ -175,7 +175,7 @@ def delete_infrequent_nodes(min_sup):
 
                 if temp.child is None:
                     root.child = temp.sibling
-                    #print '{} temp.sibling {} root.child'.format(temp.sibling.data,root.child.data)
+                    ## print '{} temp.sibling {} root.child'.format(temp.sibling.data,root.child.data)
                 elif temp.sibling is not None:
 
                     last_sibling = temp.child
@@ -202,7 +202,7 @@ def delete_infrequent_nodes(min_sup):
             x = nodes.pop()
             
             while x.sibling is None:
-                #print '({}, {})'.format(x.data, x.count)
+                ## print '({}, {})'.format(x.data, x.count)
                 
                 if len(nodes) == 0:
                     return True
@@ -228,7 +228,7 @@ def delete_infrequent_nodes(min_sup):
                 #### bug edit
                 del(temp)
 
-            #print '({}, {})'.format(x.data, x.count)
+            ## print '({}, {})'.format(x.data, x.count)
             else:
                 flag = 1
                 root = root.sibling
@@ -237,9 +237,9 @@ def delete_infrequent_nodes(min_sup):
     return True
 status = False
 status = delete_infrequent_nodes(3)
-print 'Deleted infrequent nodes: {}'.format(status)
+# print 'Deleted infrequent nodes: {}'.format(status)
 traverse()
-#print count
+## print count
 
 # merging repeating heads
 def merge_repeating_siblings():
@@ -252,7 +252,7 @@ def merge_repeating_siblings():
 
         while root.sibling is not None:
             while head is not None:
-                #print 'root {}, head {}'.format(root.data,head.data)
+                ## print 'root {}, head {}'.format(root.data,head.data)
                 if head.data != root.data:
                     head = head.sibling
                     head_parent = head_parent.sibling
@@ -326,14 +326,14 @@ def merge_repeating_siblings():
 
 status_2 = False
 status_2 = merge_repeating_siblings()
-print 'Merged repeating heads and siblings : {}'.format(status_2)
+# print 'Merged repeating heads and siblings : {}'.format(status_2)
 traverse()
 
-#print [ i for i in range(len(count)) if count[i]>=2] 
+## print [ i for i in range(len(count)) if count[i]>=2] 
 
 # traverse()
-print '-------------------------------'
-print 'All paths: '
+# print '-------------------------------'
+# print 'All paths: '
 get_paths()
 all_paths = get_paths()
 
@@ -344,13 +344,13 @@ def cfpm(min_sup):
     freq_one_itemsets = [i for i in xrange(len(count)) if count[i]>=min_sup]
     freq_one_itemsets.sort()
     freq_one_itemsets.reverse()
-    print 'frequent one itemsets = {}'.format(freq_one_itemsets)
+    # print 'frequent one itemsets = {}'.format(freq_one_itemsets)
     for i in freq_one_itemsets:
 
 
 
-        print '######################################'
-        print 'i = {}\n'.format(i)
+        # print '######################################'
+        # print 'i = {}\n'.format(i)
 
         # get paths ending with I
         # example - paths = [[count , e1, e2, e3, ...]]
@@ -361,7 +361,7 @@ def cfpm(min_sup):
 
         # deleting paths starting with i
         # BUG - 
-        print 'Removing paths starting with ',i
+        # print 'Removing paths starting with ',i
         j=0
         while j < len(all_paths):
             if all_paths[j][1][0] == i:
@@ -371,9 +371,9 @@ def cfpm(min_sup):
             j+=1
             
 
-        print 'All paths - ',all_paths,'\n'
+        # print 'All paths - ',all_paths,'\n'
 
-        # print 'paths after removing head - ',all_paths
+        # # print 'paths after removing head - ',all_paths
 
         # getting paths ending with i
         # TODO : simplify below code using list comprehension
@@ -381,14 +381,14 @@ def cfpm(min_sup):
         for path in all_paths:
 
             if path[-1][0] == i:
-                #print 'i = {}'.format(i)
-                #print 'path = {}'.format(path)
+                ## print 'i = {}'.format(i)
+                ## print 'path = {}'.format(path)
                 # paths_ending_with_i.append(list(path))
                 add_path = [path[0]] + [k[0] for k in path[1:]]
                 if add_path not in paths_ending_with_i:
                 	paths_ending_with_i.append(add_path)
 
-        print 'Paths ending with {} - {}\n'.format(i,paths_ending_with_i)
+        # print 'Paths ending with {} - {}\n'.format(i,paths_ending_with_i)
         
 
         # removing infrequent elements from paths
@@ -406,24 +406,24 @@ def cfpm(min_sup):
             if val >= min_sup:
                 T.append(key)
 
-        print 'T: {}\n'.format(T)
+        # print 'T: {}\n'.format(T)
         
 
         if len(T) != 0:
             # removing elements from paths that are not in T
-            # print 'All paths before removal: ',all_paths,'\n'
+            # # print 'All paths before removal: ',all_paths,'\n'
             for l in paths_ending_with_i:
                 for m in l[1:-1]:
-                    # print 'm = {} l = {}'.format(m,l)
+                    # # print 'm = {} l = {}'.format(m,l)
                     if m not in T:
                         # l.remove(m)
                         paths_ending_with_i[paths_ending_with_i.index(l)].remove(m)
-                    # print 'm = {} l = {}'.format(m,l)
-                    # print 'bug print ', all_paths,'\n'
+                    # # print 'm = {} l = {}'.format(m,l)
+                    # # print 'bug # print ', all_paths,'\n'
 
-            print 'Removed elements : {}\n'.format(paths_ending_with_i)
-            # print 'All paths before removal: ',all_paths,'\n'
-            # print 'Paths after removing head - ',all_paths
+            # print 'Removed elements : {}\n'.format(paths_ending_with_i)
+            # # print 'All paths before removal: ',all_paths,'\n'
+            # # print 'Paths after removing head - ',all_paths
             
             # merging duplicate reduced paths
             index = 1
@@ -436,12 +436,12 @@ def cfpm(min_sup):
                         paths_ending_with_i[j][0]+=curr_path[0]
                         paths_ending_with_i.remove(curr_path)
                         index-=1
-                        # print 'curr path {}, index {}'.format(curr_path, index+1)
+                        # # print 'curr path {}, index {}'.format(curr_path, index+1)
 
                 index +=1 
 
-            print 'Merged duplicates\n All paths - ',paths_ending_with_i,'\n'
-            # print 'All paths before removal: ',all_paths,'\n'
+            # print 'Merged duplicates\n All paths - ',paths_ending_with_i,'\n'
+            # # print 'All paths before removal: ',all_paths,'\n'
 
             # final reduced paths (update count considering subsets)
             index =1
@@ -453,13 +453,13 @@ def cfpm(min_sup):
                     
                     if set(curr_path[1:]).issubset(paths_ending_with_i[j][1:]):
                         paths_ending_with_i[index][0]+=paths_ending_with_i[j][0]
-                        # print 'curr path {}, index {}'.format(curr_path, index)
+                        # # print 'curr path {}, index {}'.format(curr_path, index)
 
                 index+=1
-            print 'Final reduced paths - ', paths_ending_with_i,'\n'
+            # print 'Final reduced paths - ', paths_ending_with_i,'\n'
 
         # deleting items that are already processed to give paths ending with smaller elements
-        # print 'All paths before removal: ',all_paths,'\n'
+        # # print 'All paths before removal: ',all_paths,'\n'
         j=0
         while j<len(all_paths):
             if all_paths[j][-1][0] == i:
@@ -469,8 +469,8 @@ def cfpm(min_sup):
                     all_paths.remove(all_paths[j])
             j += 1
         # all_paths = 
-        print 'All paths after removal: ',all_paths,'\n'
-        print '############################################'
+        # print 'All paths after removal: ',all_paths,'\n'
+        # print '############################################'
 
 
         
@@ -479,7 +479,7 @@ def cfpm(min_sup):
        		if j[0] >= min_sup:
        			cfi.append(list(j))
 
-    print '##############\nPotential Closed Frequent Itemsets: ',cfi,'\n'
+    # print '##############\nPotential Closed Frequent Itemsets: ',cfi,'\n'
        	
 
     cfi.sort(key = lambda x: len(x), reverse=True )
@@ -488,50 +488,24 @@ def cfpm(min_sup):
 
     while index < len(cfi):
         curr_cfi = cfi[index]
-        
+        # print (curr_cfi in cfi)
         for j in range(index):
             
             if set(curr_cfi[1:]).issubset(cfi[j][1:]) and curr_cfi[0] == cfi[j][0]:
+            	# print (curr_cfi in cfi)
                 cfi.remove(curr_cfi)
                 index -= 1
-                # print 'curr path {}, index {}'.format(curr_path, index)
+                break
+                # # print 'curr path {}, index {}'.format(curr_path, index)
 
         index+=1
 
     print '##############\nClosed Frequent Itemsets: ',cfi,'\n'
-
-        # if i==7:
-            # break
-        
-    '''
-
-        closed_freq=[]
-        # determining closed frequent itemsets from reduced paths
-       
-        
-
-
-        # paths starting with elements in T and ending with I
-        start = T
-        end = i
-
-        for j in reduced_paths:
-            start_el = j[1]
-            end_el = j[-1]
-            if start_el not in T or end_el != i:
-                del j
-
-        cf_itemsets = [j[1:] for j in reduced_paths]
-        print 'cfp for i = {} is {}'.format(i, cf_itemsets)
-
-        
-
-'''
-
-        
+    print 'Number of documents - ', len(transactions)
+    print 'Number of closed frequent itemsets - ', len(cfi)
 
 cfpm(3)
-#traverse()
+
 
 
             
