@@ -5,15 +5,21 @@ class Node(object):
         self.sibling = None
         self.data = data
         self.count = count
-transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
-   2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
+# transactions = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [
+#    2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
 
 # import json
 # load_transactions = open('../apriori/itemsets','r')
 # transactions = json.load(load_transactions)
 #print transactions_2[0:2]
 # pct construction
+
+import ast
+with open("../transactions") as t:
+    transactions = ast.literal_eval(t.read())
+
 r2=len(transactions)
+# r2=len(transactions)
 
 # get number of distinct items and max item val
 items = []
@@ -121,7 +127,7 @@ def get_paths():
             
         x = nodes.pop()
         if x.child is None:
-            nodes_data = [x.count] + [ i.data for i in nodes] + [x.data]
+            nodes_data = [x.count] + [ (i.data, i.count) for i in nodes] + [(x.data, x.count)]
             
             print nodes_data
             paths.append(nodes_data)
@@ -328,11 +334,16 @@ all_paths = get_paths()
 
 def cfpm(min_sup):
     # reverse array of frequent 1-itemsets
+    global all_paths
+    cfi = []
     freq_one_itemsets = [i for i in xrange(len(count)) if count[i]>=min_sup]
     freq_one_itemsets.sort()
     freq_one_itemsets.reverse()
     print 'frequent one itemsets = {}'.format(freq_one_itemsets)
     for i in freq_one_itemsets:
+
+
+
         print '######################################'
         print 'i = {}\n'.format(i)
 
@@ -348,7 +359,7 @@ def cfpm(min_sup):
         print 'Removing paths starting with ',i
         j=0
         while j < len(all_paths):
-            if all_paths[j][1] == i:
+            if all_paths[j][1][0] == i:
                 
                 all_paths.remove(all_paths[j])
                 j-=1
@@ -364,10 +375,14 @@ def cfpm(min_sup):
         paths_ending_with_i = []
         for path in all_paths:
 
-            if path[-1] == i:
+            if path[-1][0] == i:
                 #print 'i = {}'.format(i)
                 #print 'path = {}'.format(path)
-                paths_ending_with_i.append(list(path))
+                # paths_ending_with_i.append(list(path))
+                add_path = [path[0]] + [k[0] for k in path[1:]]
+                if add_path not in paths_ending_with_i:
+                	paths_ending_with_i.append(add_path)
+
         print 'Paths ending with {} - {}\n'.format(i,paths_ending_with_i)
         
 
@@ -442,19 +457,48 @@ def cfpm(min_sup):
         # print 'All paths before removal: ',all_paths,'\n'
         j=0
         while j<len(all_paths):
-            if all_paths[j][-1] == i:
-                all_paths[j].remove(i)
+            if all_paths[j][-1][0] == i:
+                all_paths[j].remove(all_paths[j][-1])
+                all_paths[j][0] = all_paths[j][-1][1]
                 if len(all_paths[j]) == 1:
                     all_paths.remove(all_paths[j])
             j += 1
+        # all_paths = 
         print 'All paths after removal: ',all_paths,'\n'
         print '############################################'
 
 
+        
+        # cfi = []
+       	for j in paths_ending_with_i:
+       		if j[0] >= min_sup:
+       			cfi.append(list(j))
+
+    print '##############\nPotential Closed Frequent Itemsets: ',cfi,'\n'
+       	
+
+    cfi.sort(key = lambda x: len(x), reverse=True )
+
+    index =1
+
+    while index < len(cfi):
+        curr_cfi = cfi[index]
+        
+        for j in range(index):
+            
+            if set(curr_cfi[1:]).issubset(cfi[j][1:]) and curr_cfi[0] == cfi[j][0]:
+                cfi.remove(curr_cfi)
+                index -= 1
+                # print 'curr path {}, index {}'.format(curr_path, index)
+
+        index+=1
+
+    print '##############\nClosed Frequent Itemsets: ',cfi,'\n'
+
         # if i==7:
             # break
         
-        '''
+    '''
 
         closed_freq=[]
         # determining closed frequent itemsets from reduced paths
