@@ -1,114 +1,91 @@
 import random
 import math
 
-#Function to remove duplicate values from the relevant terms 
-def Remove(duplicate):
-    final_list = []
-    for num in duplicate:
-        if num not in final_list:
-            final_list.append(num)
-    return final_list
+Max = 1000
 
 # Function to calculatethe relevant terms between the closed frequent pattern and users request. 
 def find_relevant(no):
 	sl=query.split(' ')
-	#print "----------- SL : ",sl
 	result=[]
-	for x in freq_patterns[no]:
-		#print "x:",x
-		for y in sl:
-			#print "*** y : ",y
-			if (y in x):
-				result.append(y)
-	#print "-----RESULT1 : ",result
-	result = Remove(result)
-	#print "-----RESULT2 : ",result
+        #print "freq_patterns ",freq_patterns,"  sl:  ",sl 
+        result = [i for x in freq_patterns[no] for i in x if i in sl]
+        result = list(set(result))
+        print "result:  ",result 
 	return result
 
 #Main BSO Function 
 def BSO(clusters,freq_patterns,query):
 
 	relevant_terms=[]
-	cluster_length=len(clusters)
+	no_of_clusters=len(clusters)
  
 	#Find relevant terms w.r.t each cluster
-	for i in range(0,cluster_length):
+	for i in range(0,no_of_clusters):
 		relevant_terms.append(find_relevant(i))
 	#print relevant_terms
 
 	#BeeIniT: Solution of this problem
 	#Initialize BeeInit : such that equal number of documents from each cluster.
 	solution_size=6
-	each_cluster=solution_size/cluster_length
+	each_cluster=solution_size/no_of_clusters
 	#print each_cluster
 	
 	BeeInit=[]
-	for x in clusters:
-		bee_len=len(BeeInit)
-		compar=bee_len+each_cluster
-		while bee_len!=compar:
-			my_elem = random.choice(x)
-			#print my_elem	
-			if my_elem not in BeeInit:
-				BeeInit.append(my_elem)
-				bee_len+=1
-							
-	#print BeeInit
+        bees = []
+        # TODO : Take care of case when each_cluster > no of elements in the cluster
+        for i in clusters:
+            j = 0
+            k = []
+            while j < each_cluster:
+                ele = random.choice(i)
+                if ele not in BeeInit:
+                    BeeInit.append(ele)
+                    k.append(ele)
+                    j += 1
+            bees.append(k)
+
+        print "BeeInit: ",BeeInit
+        print "Bees: ",bees 
 	number_of_iterations=0
-	while number_of_iterations ! = Max :
-		#Each Bee gets One cluster for searching 
-		no_of_bees=cluster_length
-		bees=[]
-	
-		#Each bee should be allocated its region according to the cluster 
-		for y in clusters:
-			bee_dummy_list=[]
-			for x in BeeInit:	
-				if x in y:
-					bee_dummy_list.append(x)
-				#print bee_dummy_list
-			bees.append(bee_dummy_list)
-		#print bees
-		
+	while number_of_iterations < Max :
+
 		#Random number u and probability to be compared in ordert update positions 
 		random_number=random.uniform(0, 1)
 		print random_number
-		
 	
 		#Calculate the probability for each bee and compare with the random number generated 
-		for x in bees:
-			for y in x:#Each Bee Solution 
+		for i in range(0,len(bees)):
+			for j in bees[i]:#Each Bee Solution 
 				num=0
-				indexes=bees.index(x)
-				den=len(relevant_terms[indexes])
 				#Read all the terms from file name into a list called doc_relevant to compare with the relevant_terms
-				filename = "%s.txt" % y
-				f = open(filename , 'r')
-				doc_relevant=[]
-				s=f.readline()
-				while (s):
-    					doc_relevant=s.split(',')
-    					s=f.readline()
+				filename = "doc%s" % j
+                                with open("Medline/text_files/"+filename) as f:
+                                    """
+                                    for line in f:
+                                        # TODO clean this part
+                                        l = line.replace('.','').replace(',','')
+                                        a = l.split('  ')
+                                        a = filter(None,a)
+                                        a = [i for i in a if i != '\r']
+                                    """
+                                    s = f.read()
+                                s = s.replace('.','').replace(',','').replace('\r\n','').replace('\r','')
+                                doc_relevant = s.split()
 				print doc_relevant
-				print relevant_terms[indexes]
+				print relevant_terms[i]
 			
-				if doc_relevant in relevant_terms[indexes]:
-					num+=1
-				#print den,num
-				probability=float(num)/den
+                                num = len(list(set(doc_relevant) & set(relevant_terms[i])))
+                                # TODO: Add case where relevant_terms is empty
+                                probability=float(num)/len(relevant_terms[i])
 				#print probability
 				
  				temp=[] #Temporary list to hold the document to be changed
-				
 				#Replace the document if prob < u 
 				if probability < random_number :
-					#bees[i].remove(y)
-					#Replace This x with a new document from that cluster
-					indexes=bees.index(x)
-					#To check from document and the bee list for matching documents and selecting the right					
+                                        #To check from document and the bee list for matching documents and selecting the right					
 					while (1):
-						my_elem = random.choice(clusters[indexes])		
-						if my_elem not in x:
+						my_elem = random.choice(clusters[i])		
+						if my_elem not in bees[i]:
 							temp.append(my_elem)
 							break
 				#Else just append the document to the temp list
@@ -116,26 +93,21 @@ def BSO(clusters,freq_patterns,query):
 					temp.append(y)
 			#Remove the old bee solution
 			#Add the new bee solution 		
-			bees.remove(x)
-			bees.append(temp)
+			bees.remove(bees[i])
+                        # to make sure new bees[i] is placed at i index itself
+			bees.insert(i,temp)
 			print bees
 		
 		#Merging of Dance Table
 		BeeInit=bees
+                # TODO: Update bees after BeeInit is changed every time
+
 	number_of_iterations+=1
 
 	print "Final Sloution is ",BeeInit
 
-				
-				
-		
-			
-		
-
-
-
 #Input clusters and frequent patterns from the respective text files and user input is from terminal
-clusters = [[1,2,6],[3,4,5],[6,7,8]]
+clusters = [[1,2,6],[3,4,5],[7,8]]
 freq_patterns =[[['hello','hi'],['hi']],[['i','am'],['busy']],['hi']]
 query=raw_input("What is the User Query: ")
 
