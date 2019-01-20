@@ -1,2 +1,13 @@
 BSO_IR/
 .DS_Store
+apriori/
+env/
+vsm.ipynb
+transactions
+.ipynb_checkpoints/
+tfidf_matrix
+doc2vec_vectors
+doc_tokens
+medline_model_doc2vec
+doc_transactions
+cluster_labels

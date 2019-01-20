@@ -11,8 +11,8 @@ class Node(object):
 
 
 import json
-load_transactions = open('../transactions','r')
-transactions = json.load(load_transactions)
+load_transactions = open('../doc_transactions','r')
+all_transactions = json.load(load_transactions)
 
 # pct construction
 
@@ -20,7 +20,7 @@ transactions = json.load(load_transactions)
 # with open("../transactions") as t:
 #     transactions = ast.literal_eval(t.read())
 
-r2=len(transactions)
+# r2=len(transactions)
 
 
 # get number of distinct items and max item val
