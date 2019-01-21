@@ -1,4 +1,4 @@
-import random
+from random import SystemRandom
 import math
 
 Max = 1000
@@ -26,7 +26,7 @@ def BSO(clusters,freq_patterns,query):
 
 	#BeeIniT: Solution of this problem
 	#Initialize BeeInit : such that equal number of documents from each cluster.
-	solution_size=6
+	solution_size=8
 	each_cluster=solution_size/no_of_clusters
 	#print each_cluster
 	
@@ -37,7 +37,7 @@ def BSO(clusters,freq_patterns,query):
             j = 0
             k = []
             while j < each_cluster:
-                ele = random.choice(i)
+                ele = SystemRandom().choice(i)
                 if ele not in BeeInit:
                     BeeInit.append(ele)
                     k.append(ele)
@@ -50,59 +50,49 @@ def BSO(clusters,freq_patterns,query):
 	while number_of_iterations < Max :
 
 		#Random number u and probability to be compared in ordert update positions 
-		random_number=random.uniform(0, 1)
+		random_number=SystemRandom().uniform(0, 1)
 		print random_number
 	
 		#Calculate the probability for each bee and compare with the random number generated 
 		for i in range(0,len(bees)):
-			for j in bees[i]:#Each Bee Solution 
+			for j in range(0,len(bees[i])):#Each Bee Solution 
 				num=0
 				#Read all the terms from file name into a list called doc_relevant to compare with the relevant_terms
-				filename = "doc%s" % j
+				filename = "doc%s" % bees[i][j]
                                 with open("Medline/text_files/"+filename) as f:
-                                    """
-                                    for line in f:
-                                        # TODO clean this part
-                                        l = line.replace('.','').replace(',','')
-                                        a = l.split('  ')
-                                        a = filter(None,a)
-                                        a = [i for i in a if i != '\r']
-                                    """
                                     s = f.read()
                                 s = s.replace('.','').replace(',','').replace('\r\n','').replace('\r','')
                                 doc_relevant = s.split()
-				print doc_relevant
-				print relevant_terms[i]
+                                #print "iteration num: {}, doc_relevant: {}".format(number_of_iterations,doc_relevant)
+                                #print "relevant_terms: ",relevant_terms[i]
 			
                                 num = len(list(set(doc_relevant) & set(relevant_terms[i])))
                                 # TODO: Add case where relevant_terms is empty
-                                probability=float(num)/len(relevant_terms[i])
+                                if len(relevant_terms[i]) > 0:
+                                    probability=float(num)/len(relevant_terms[i])
 				#print probability
 				
- 				temp=[] #Temporary list to hold the document to be changed
 				#Replace the document if prob < u 
-				if probability < random_number :
+				if probability < random_number or len(relevant_terms[i]) < 1 :
                                         #To check from document and the bee list for matching documents and selecting the right					
 					while (1):
-						my_elem = random.choice(clusters[i])		
+                                                # case when len(bees[i]) = len(clusters[i])
+                                                if len(bees[i]) == len(clusters[i]):
+                                                    break 
+                                                my_elem = SystemRandom().choice(clusters[i])	                                      
+                                                print "my_elem: ",my_elem	
 						if my_elem not in bees[i]:
-							temp.append(my_elem)
-							break
-				#Else just append the document to the temp list
-				else:
-					temp.append(y)
-			#Remove the old bee solution
-			#Add the new bee solution 		
-			bees.remove(bees[i])
-                        # to make sure new bees[i] is placed at i index itself
-			bees.insert(i,temp)
-			print bees
-		
+                                                    print "old bees: {} bees[i]:{}".format(bees,bees[i]) 
+						    bees[i].remove(bees[i][j])
+                                                    bees[i].insert(j,my_elem)
+                                                    print " new bees: ",bees,"new bees[i]: ",bees[i]
+						    break
+                                                #print "inwhile "
 		#Merging of Dance Table
 		BeeInit=bees
                 # TODO: Update bees after BeeInit is changed every time
-
-	number_of_iterations+=1
+                print "iteration number: ",number_of_iterations 
+	        number_of_iterations+=1
 
 	print "Final Sloution is ",BeeInit
 
