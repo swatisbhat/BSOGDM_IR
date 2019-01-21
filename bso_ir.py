@@ -1,11 +1,31 @@
 from random import SystemRandom
 import math
 
+    from sklearn.feature_extraction.text import CountVectorizer
 Max = 1000
 
+def tokenize(text):
+    tokens = []
+    for token in nltk.word_tokenize(text.lower()):
+        if token not in string.punctuation and token not in stop_words:
+            tokens.append(lemmatizer.lemmatize(token))
+    tokens = [token for token in tokens if not token.isdigit()]
+    return tokens
+
+def map_to_index(query):
+
+    terms_map = json.load(open('index_terms','r'))
+    query_term_indices = []
+    for i in tokenize(query):
+        query_term_indices.append(terms_map[i])
+
+    return query_term_indices
+
+    
+
 # Function to calculatethe relevant terms between the closed frequent pattern and users request. 
-def find_relevant(no):
-	sl=query.split(' ')
+def find_relevant(no, query):
+	sl=map_to_index(query)
 	result=[]
         #print "freq_patterns ",freq_patterns,"  sl:  ",sl 
         result = [i for x in freq_patterns[no] for i in x if i in sl]
@@ -21,7 +41,7 @@ def BSO(clusters,freq_patterns,query):
  
 	#Find relevant terms w.r.t each cluster
 	for i in range(0,no_of_clusters):
-		relevant_terms.append(find_relevant(i))
+		relevant_terms.append(find_relevant(i, query))
 	#print relevant_terms
 
 	#BeeIniT: Solution of this problem
