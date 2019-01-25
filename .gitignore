@@ -2,6 +2,7 @@ BSO_IR/
 .DS_Store
 apriori/
 env/
+*.pyc
 vsm.ipynb
 transactions
 .ipynb_checkpoints/
