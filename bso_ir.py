@@ -5,7 +5,7 @@ from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 
 
-Max = 400
+Max = 100
 stop_words = set(stopwords.words('english'))
 
 def tokenize(text):
@@ -30,17 +30,18 @@ def map_to_index(query):
     
 
 # Function to calculatethe relevant terms between the closed frequent pattern and users request. 
-def find_relevant(no, query):
+def find_relevant(no, query, freq_patterns):
     sl=map_to_index(query)
     result=[]
     #print "freq_patterns ",freq_patterns,"  sl:  ",sl 
     result = [i for x in freq_patterns[no] for i in x if i in sl]
     result = list(set(result))
-    print "result:  ",result 
+    #print "result:  ",result 
     return result
 
+
 #Main BSO Function 
-def BSO(clusters,freq_patterns,query):
+def BSO(clusters,freq_patterns,query, solution_size):
 
     doc_term_indices = json.load(open('doc_transactions','r'))
     relevant_terms=[]
@@ -48,12 +49,13 @@ def BSO(clusters,freq_patterns,query):
 
     #Find relevant terms w.r.t each cluster
     for i in range(0,no_of_clusters):
-    	relevant_terms.append(find_relevant(i, query))
+    	relevant_terms.append(find_relevant(i, query, freq_patterns))
     #print relevant_terms
-
+    if len(relevant_terms)==0:
+        return None
     #BeeIniT: Solution of this problem
     #Initialize BeeInit : such that equal number of documents from each cluster.
-    solution_size=8
+    
     each_cluster=solution_size/no_of_clusters
     #print each_cluster
 
@@ -72,13 +74,13 @@ def BSO(clusters,freq_patterns,query):
         bees.append(k)
 
     # print "BeeInit: ",BeeInit
-    print "Bees: ",bees 
+    # print "Bees: ",bees 
     number_of_iterations=0
     while number_of_iterations < Max :
 
     	#Random number mu and probability to be compared in ordert update positions 
     	random_number=SystemRandom().uniform(0, 1)
-    	print random_number
+    	#print random_number
 
     	#Calculate the probability for each bee and compare with the random number generated 
     	for i in range(0,len(bees)):
@@ -104,18 +106,18 @@ def BSO(clusters,freq_patterns,query):
                         if len(bees[i]) == len(clusters[i]):
                             break 
                         my_elem = SystemRandom().choice(clusters[i])	                                      
-                        print "my_elem: ",my_elem	
+                        #print "my_elem: ",my_elem	
                         if my_elem not in bees[i]:
-                            print "old bees: {} bees[i]:{}".format(bees,bees[i]) 
+                            #print "old bees: {} bees[i]:{}".format(bees,bees[i]) 
                             bees[i].remove(bees[i][j])
                             bees[i].insert(j,my_elem)
-                            print " new bees: ",bees,"new bees[i]: ",bees[i]
+                            #print " new bees: ",bees,"new bees[i]: ",bees[i]
                             break
                             
     	#Merging of Dance Table
     	# BeeInit=bees
         # TODO: Update bees after BeeInit is changed every time
-        print "iteration number: ",number_of_iterations 
+        #print "iteration number: ",number_of_iterations 
         number_of_iterations+=1
     
     #print "Final Sloution is ",bees
@@ -129,5 +131,5 @@ if __name__=="__main__":
     # freq_patterns =[[['hello','hi'],['hi']],[['i','am'],['busy']],['hi']]
     query=raw_input("What is the User Query: ")
 
-    BSO(clusters,freq_patterns,query)
+    BSO(clusters,freq_patterns,query, 8)
 
