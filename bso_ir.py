@@ -117,15 +117,17 @@ def BSO(clusters,freq_patterns,query):
         # TODO: Update bees after BeeInit is changed every time
         print "iteration number: ",number_of_iterations 
         number_of_iterations+=1
+    
+    #print "Final Sloution is ",bees
+    return bees 
 
-    print "Final Sloution is ",bees
+if __name__=="__main__":
+    #Input clusters and frequent patterns from the respective text files and user input is from terminal
+    # clusters = [[1,2,6],[3,4,5],[7,8]]
+    clusters = json.load(open('pct/doc_clusters','r'))
+    freq_patterns = json.load(open('pct/cluster_cfi','r'))
+    # freq_patterns =[[['hello','hi'],['hi']],[['i','am'],['busy']],['hi']]
+    query=raw_input("What is the User Query: ")
 
-#Input clusters and frequent patterns from the respective text files and user input is from terminal
-# clusters = [[1,2,6],[3,4,5],[7,8]]
-clusters = json.load(open('pct/doc_clusters','r'))
-freq_patterns = json.load(open('pct/cluster_cfi','r'))
-# freq_patterns =[[['hello','hi'],['hi']],[['i','am'],['busy']],['hi']]
-query=raw_input("What is the User Query: ")
-
-BSO(clusters,freq_patterns,query)
+    BSO(clusters,freq_patterns,query)
 
