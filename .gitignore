@@ -12,3 +12,6 @@ medline_model_doc2vec
 doc_transactions
 cluster_labels
 index_terms
+classic/
+pct/cluster_cfi
+pct/doc_clusters

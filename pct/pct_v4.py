@@ -539,6 +539,8 @@ if __name__=="__main__":
 	for i in xrange(len(cluster_labels)):
 		doc_clusters[cluster_labels[i]].append(i)
 
+
+
 	# create list of cluster itemsets 
 	cluster_transactions = [[] for x in xrange(len(set(cluster_labels)))]
 	for i in doc_clusters:
@@ -550,7 +552,7 @@ if __name__=="__main__":
 	min_sup = 3
 
 
-	x = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
+	# x = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
 
 	for x in cluster_transactions:
 		cluster_rpctree = RPCTree(x, min_sup)
@@ -560,7 +562,8 @@ if __name__=="__main__":
 		cluster_cfi.append(list(cluster_rpctree.cfpm())) 
 
 	print len(cluster_cfi)
-
+	json.dump(doc_clusters,open('doc_clusters','w'))
+	json.dump(cluster_cfi, open('cluster_cfi','w'))
 
 	
 
