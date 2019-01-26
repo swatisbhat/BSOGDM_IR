@@ -18,31 +18,20 @@ def file2list(f):
     #print rel_list
     return rel_list 
 
-def precision(rel_list,sol,index):
+def eval(rel_list,sol,index):
     rd = len(sol)
+    ard = len(rel_list[index])
     count = 0
     for i in sol:
         if i in rel_list[index]:
             count += 1
     p = float(count)/rd
     #print 'p ' ,p
-    return p
-
-def recall(rel_list,sol,index):
-    ard = len(rel_list[index])
-    count = 0
-    for i in sol:
-        if i in rel_list[index]:
-            count += 1
     r = float(count)/ard
-    #print 'r ', r
-    return r
-
-def fmeasure(precision,recall):
-    fscore = float((2*recall*precision))/(recall+precision)
-    #print 'f score ', fscore
-    return fscore
-
+    if r==0 and p==0:
+        return (p, r, 'NaN')
+    fscore = float((2*r*p))/(r+p)
+    return (p,r,fscore)
 
 
 if __name__=="__main__":
@@ -50,34 +39,35 @@ if __name__=="__main__":
     p = []
     r = []
     fm = []
-    query = json.load(open('./Medline/query','r'))
-    clusters = json.load(open('pct/doc_clusters','r'))
-    freq_patterns = json.load(open('pct/cluster_cfi','r'))
+    
+    clusters, freq_patterns, doc_transactions, index_terms, queries = bso_ir.load_json_files(['/json_files/doc_clusters','/json_files/cluster_cfi','/json_files/doc_transactions','/json_files/index_terms','/Medline/query'])
+
+    #query = json.load(open('./Medline/query','r'))
+    #clusters = json.load(open('pct/doc_clusters','r'))
+    #freq_patterns = json.load(open('pct/cluster_cfi','r'))
     sol = []
-    solution_size = 20
-    for q in query:
-        sol = bso_ir.BSO(clusters,freq_patterns,q, solution_size)
+    solution_size = 8
+    max_iter = 100
+    b = bso_ir.BSO()
+    for q in queries:
+        sol = b.bso(clusters,doc_transactions,freq_patterns,q,index_terms,solution_size, max_iter)
         if sol is None:
             p.append(0)
             r.append(0)
             fm.append(None)
             #print 'p ', 0,'\nr ',0,'None'
             continue
-        sol = [j for i in sol for j in i]
+        #sol = [j for i in sol for j in i]
         # print sol 
 
-        p.append(precision(rel_list,sol,query.index(q)))
-        r.append(recall(rel_list,sol,query.index(q)))
+        eval_results_q = eval(rel_list, sol, queries.index(q))
+        p.append(eval_results_q[0])
+        r.append(eval_results_q[1])
+        fm.append(eval_results_q[2])
 
-        if p[query.index(q)]==0 and r[query.index(q)]==0:
-            fm.append(None)
-            #print 'None'
-            continue
-
-        fm.append(fmeasure(p[query.index(q)],r[query.index(q)]))
-    print "precision: ",p,'\n\n'
-    print "recall: ",r,'\n\n'
-    print "fm: ",fm,'\n\n'
+    print "Precision: ",p,'\n\n'
+    print "Recall: ",r,'\n\n'
+    print "F-score: ",fm,'\n\n'
 
 
 
