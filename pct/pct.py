@@ -513,13 +513,15 @@ if __name__=="__main__":
 
 
 	cluster_cfi = []
-	min_sup = 3
+	min_sup = 10
 
 
 	# x = [[1, 5, 6, 8], [2, 4, 8], [4, 5, 7], [2, 3], [5, 6, 7], [2, 3, 4], [2, 6, 7, 9], [5], [8], [3, 5, 7], [3, 5, 7], [5, 6, 8], [2, 4, 6, 7], [1, 3, 5, 7], [2, 3, 9]]
 
+
 	for x in cluster_transactions:
-		cluster_rpctree = RPCTree(x, min_sup)
+                min_sup_c = int(min_sup * float(len(x))/len(all_transactions))
+		cluster_rpctree = RPCTree(x, min_sup_c)
 		cluster_rpctree.construct()
 		# cluster_rpctree.traverse()
 

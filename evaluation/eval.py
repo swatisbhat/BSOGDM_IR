@@ -3,7 +3,8 @@ import json
 import os
 sys.path.insert(0,os.getcwd())
 
-import bso_ir
+import bso_ir, bso2
+
 
 def file2list(f):
     file = open(f,'r').read()
@@ -13,7 +14,7 @@ def file2list(f):
     rel_list = [[] for i in xrange(last_query)]
     for i in files[:-1]:
         #print "i: ",i
-        rel_list[int(i[0])-1].append(int(i[2]))
+        rel_list[int(i[0])-1].append(int(i[2])-1)
         
     #print rel_list
     return rel_list 
@@ -29,9 +30,10 @@ def eval(rel_list,sol,index):
     #print 'p ' ,p
     r = float(count)/ard
     if r==0 and p==0:
-        return (p, r, 'NaN')
+        return (p, r, 0)
     fscore = float((2*r*p))/(r+p)
     return (p,r,fscore)
+
 
 
 if __name__=="__main__":
@@ -46,10 +48,16 @@ if __name__=="__main__":
     #clusters = json.load(open('pct/doc_clusters','r'))
     #freq_patterns = json.load(open('pct/cluster_cfi','r'))
     sol = []
-    solution_size = 8
-    max_iter = 100
-    b = bso_ir.BSO()
+    solution_size = 12
+    max_iter = 300
+    b = bso2.BSO()
+    b2 = bso2.BSO()
+
     for q in queries:
+        query_term_indices = b2.map_to_index(q,index_terms)
+        print 'Relevant Docs: ', rel_list[queries.index(q)]
+        fitness = b2.calc_fitness(rel_list[queries.index(q)], doc_transactions, query_term_indices)
+        print 'Expected Fitness: ', fitness
         sol = b.bso(clusters,doc_transactions,freq_patterns,q,index_terms,solution_size, max_iter)
         if sol is None:
             p.append(0)
@@ -68,6 +76,10 @@ if __name__=="__main__":
     print "Precision: ",p,'\n\n'
     print "Recall: ",r,'\n\n'
     print "F-score: ",fm,'\n\n'
+
+    print 'Avg Precision: ', float(sum(p))/len(p)
+    print 'Avg Recall: ', float(sum(r))/len(r)
+    print 'Avg F-score: ', float(sum(fm))/len(fm)
 
 
 
