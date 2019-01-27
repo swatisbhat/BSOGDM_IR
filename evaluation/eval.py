@@ -3,7 +3,7 @@ import json
 import os
 sys.path.insert(0,os.getcwd())
 
-import bso_ir, bso2
+import bso_ir, bso2, bso3
 
 
 def file2list(f):
@@ -58,6 +58,20 @@ if __name__=="__main__":
         print 'Relevant Docs: ', rel_list[queries.index(q)]
         fitness = b2.calc_fitness(rel_list[queries.index(q)], doc_transactions, query_term_indices)
         print 'Expected Fitness: ', fitness
+        
+        # sol2
+        r_docs = [x for x in xrange(1033)]
+        fitness_of_docs = []
+        for doc in r_docs:
+            num = len(list(set(query_term_indices) & set(doc_transactions[doc])))
+            den = len(doc_transactions[doc]) * len(query_term_indices)
+            
+            fitness_of_docs.append((doc , float(num)/den))
+        fitness_of_docs.sort(key = lambda x: x[1],reverse = True)
+        best_docs = [ fitness_of_docs[y][0] for y in range(solution_size) ]
+        print 'Best Docs: ', best_docs
+        print 'Best Fitness: ', b2.calc_fitness(best_docs, doc_transactions,query_term_indices)
+
         sol = b.bso(clusters,doc_transactions,freq_patterns,q,index_terms,solution_size, max_iter)
         if sol is None:
             p.append(0)
@@ -72,6 +86,8 @@ if __name__=="__main__":
         p.append(eval_results_q[0])
         r.append(eval_results_q[1])
         fm.append(eval_results_q[2])
+
+        
 
     print "Precision: ",p,'\n\n'
     print "Recall: ",r,'\n\n'

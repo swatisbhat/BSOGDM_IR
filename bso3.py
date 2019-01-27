@@ -72,14 +72,17 @@ class BSO:
         #BeeIniT: Solution of this problem
         #Initialize BeeInit : such that equal number of documents from each cluster.
         
-        doc_probabilities = [0 for x in xrange(len(doc_term_indices))]
+        doc_probabilities = [(x, 0) for x in xrange(len(doc_term_indices))]
         for i in range(no_of_clusters):
             for j in doc_clusters[i]:
                 prob = len(list(set(doc_term_indices[j]) & set(relevant_terms[i])))
                 if len(relevant_terms[i])>0:
-                    doc_probabilities[j] = float(prob)/len(relevant_terms[i])
-                
-
+                    doc_probabilities[j] = (j,\
+                            float(prob)/len(relevant_terms[i]))
+        doc_probabilities.sort(key= lambda x: x[1], reverse=True)
+        BeeInit = [ doc_probabilities[x][0] for x in xrange(solution_size)]
+            
+        '''
         each_cluster=solution_size/no_of_clusters
         #print each_cluster
 
@@ -182,7 +185,7 @@ class BSO:
             #print "iteration number: ",number_of_iterations 
             number_of_iterations+=1
             #BeeInit = [ j for i in bees for j in i ]
-        prev_fitness = fitness_val
+        prev_fitness = fitness_val'''
         fitness_val = self.calc_fitness(BeeInit, doc_term_indices, query_term_indices)
         print 'Fitness Val : ',fitness_val
         print 'BEEinit: ', BeeInit
